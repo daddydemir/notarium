@@ -4,9 +4,9 @@ Yazar: Claude
 Oluşturma Tarihi: 15 Mayıs 2025
 Durum: Taslak
 İlgili Birimler: Frontend Ekibi, Backend Ekibi, UX Tasarım
-1. Özet
+## 1. Özet
 Bu RFC, günlük bazlı kişisel not tutma ve bilgi yönetimi için tasarlanmış çok platformlu bir uygulama önerisi sunmaktadır. Sistem, kullanıcılara günlük kayıtlar oluşturma, konuları etiketleme, dosya ekleme ve çoklu cihaz senkronizasyonu özellikleri sunarak kişisel bilgi yönetimini (Personal Knowledge Management - PKM) kolaylaştırmayı amaçlamaktadır.
-2. Motivasyon
+## 2. Motivasyon
 Modern bilgi işçileri ve öğrenciler, giderek artan bir bilgi yığını ile baş etmek zorundadır. Mevcut not alma uygulamaları genellikle ya aşırı karmaşık ya da temel özelliklerden yoksundur. Bu proje, şu sorunları çözmeyi hedeflemektedir:
 
 Günlük bazlı not tutma alışkanlığını teşvik etme
@@ -15,8 +15,10 @@ Bilgiyi etiketlerle anlamlı şekilde organize etme
 Markdown desteğiyle hızlı ve etkili formatlama imkanı sunma
 Arama ve filtreleme ile bilgiye hızlı erişim
 
-3. Tasarım Detayları
-3.1 Sistem Mimarisi
+## 3. Tasarım Detayları
+
+### 3.1 Sistem Mimarisi
+
 ```
 ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
 │   Frontend  │◄── ─►│    API      │◄────►│  PostgreSQL │
@@ -25,7 +27,7 @@ Arama ve filtreleme ile bilgiye hızlı erişim
 └─────────────┘      └─────────────┘      └─────────────┘
 ```
 
-3.2 Veri Modeli
+### 3.2 Veri Modeli
 
 **entries (Günlük Kayıtları)**
 ```
@@ -765,230 +767,160 @@ GET /api/v1/search?tags=backend,frontend
   "status": "imported"
 }
 ```
+## 3.4 Frontend Yapısı
 
-3.4 Frontend Yapısı
 Frontend mimarisinde MVC (Model-View-Controller) desenine benzer bir yapı kullanılacak:
 
-Sayfalar:
+### Sayfalar
+- Ana sayfa (Günlük görünümü)
+- Konu detay sayfası
+- Etiket bazlı filtreleme sayfası
+- Arama sonuçları sayfası
+- Ayarlar sayfası
+- İçe/Dışa aktarma sayfası
 
-Ana sayfa (Günlük görünümü)
-Konu detay sayfası
-Etiket bazlı filtreleme sayfası
-Arama sonuçları sayfası
-Ayarlar sayfası
-İçe/Dışa aktarma sayfası
-
-
-Bileşenler:
-
-Markdown editörü
-Dosya yükleme bileşeni
-Etiket seçici
-Takvim widget'ı
-Hatırlatıcı oluşturucu
-
-
+### Bileşenler
+- Markdown editörü
+- Dosya yükleme bileşeni
+- Etiket seçici
+- Takvim widget'ı
+- Hatırlatıcı oluşturucu
 
 Frontend, responsive tasarım prensiplerine uygun olarak geliştirilecek ve mobil cihazlarda da sorunsuz çalışacaktır.
-4. Teknik Zorluklar ve Çözümler
-4.1 Markdown İşleme
+
+## 4. Teknik Zorluklar ve Çözümler
+
+### 4.1 Markdown İşleme
 Markdown metnini HTML'e dönüştürmek için client-side bir Markdown parser kütüphanesi kullanılacak. Önerilen kütüphaneler:
+- marked.js
+- showdown.js
 
-marked.js
-showdown.js
-
-4.2 Veri Senkronizasyonu
+### 4.2 Veri Senkronizasyonu
 Çoklu cihaz senkronizasyonu için:
+- Her işlem sonrası API ile iletişim kurulacak
+- Çevrimdışı kullanım için IndexedDB kullanılacak
+- Çevrimdışı değişiklikler, çevrimiçi olunduğunda otomatik senkronize edilecek
+- Çakışma çözümü için "son yazma kazanır" politikası kullanılacak
 
-Her işlem sonrası API ile iletişim kurulacak
-Çevrimdışı kullanım için IndexedDB kullanılacak
-Çevrimdışı değişiklikler, çevrimiçi olunduğunda otomatik senkronize edilecek
-Çakışma çözümü için "son yazma kazanır" politikası kullanılacak
-
-4.3 Dosya Depolama
+### 4.3 Dosya Depolama
 Dosyalar için iki seçenek değerlendirilecek:
-
-Yerel dosya sistemi (daha basit ve hızlı başlangıç için)
-S3-uyumlu bir nesne depolama hizmeti (ölçeklenebilirlik için)
+- Yerel dosya sistemi (daha basit ve hızlı başlangıç için)
+- S3-uyumlu bir nesne depolama hizmeti (ölçeklenebilirlik için)
 
 Başlangıçta 1. seçeneğin uygulanması, daha sonra gerekirse 2. seçeneğe geçiş planlanmaktadır.
-5. Uygulama Takvimi
 
+## 5. Uygulama Takvimi
 
+| Aşama                     | Süre       | Açıklama                                                                 |
+|---------------------------|------------|--------------------------------------------------------------------------|
+| Tasarım ve Planlama       | 2 hafta    | Teknik tasarım, UI/UX tasarımı finalize edilecek                         |
+| Veritabanı Kurulumu       | 1 hafta    | Şema oluşturma, migration yazılması                                      |
+| Backend API Geliştirme    | 3 hafta    | Temel API endpoint'lerinin uygulanması                                   |
+| Frontend Geliştirme       | 4 hafta    | Ana sayfa, konu sayfası ve temel işlevlerin geliştirilmesi               |
+| Entegrasyon               | 2 hafta    | Frontend ve backend entegrasyonu                                        |
+| Test                      | 2 hafta    | Birim ve entegrasyon testleri                                           |
+| Beta Sürümü               | 1 hafta    | İlk kullanıcı testleri ve geri bildirim alma                             |
+| İyileştirme               | 2 hafta    | Beta geri bildirimlerine dayalı iyileştirmeler                          |
+| İlk Sürüm                 | -          | MVP özellikleriyle ilk kararlı sürüm                                    |
 
-Aşama
-Süre
-Açıklama
+**Toplam geliştirme süresi:** 15 hafta
 
+## 6. Ölçme ve Başarı Kriterleri
 
-
-Tasarım ve Planlama
-2 hafta
-Teknik tasarım, UI/UX tasarımı finalize edilecek
-
-
-Veritabanı Kurulumu
-1 hafta
-Şema oluşturma, migration yazılması
-
-
-Backend API Geliştirme
-3 hafta
-Temel API endpoint'lerinin uygulanması
-
-
-Frontend Geliştirme
-4 hafta
-Ana sayfa, konu sayfası ve temel işlevlerin geliştirilmesi
-
-
-Entegrasyon
-2 hafta
-Frontend ve backend entegrasyonu
-
-
-Test
-2 hafta
-Birim ve entegrasyon testleri
-
-
-Beta Sürümü
-1 hafta
-İlk kullanıcı testleri ve geri bildirim alma
-
-
-İyileştirme
-2 hafta
-Beta geri bildirimlerine dayalı iyileştirmeler
-
-
-İlk Sürüm
--
-MVP özellikleriyle ilk kararlı sürüm
-
-
-Toplam geliştirme süresi: 15 hafta
-6. Ölçme ve Başarı Kriterleri
 Projenin başarısı aşağıdaki metriklerle değerlendirilecektir:
 
-Kullanıcı Deneyimi Metrikleri:
+### Kullanıcı Deneyimi Metrikleri
+- Ortalama günlük aktif kullanıcı sayısı
+- Ortalama oturum süresi
+- Günlük oluşturulan not sayısı
 
-Ortalama günlük aktif kullanıcı sayısı
-Ortalama oturum süresi
-Günlük oluşturulan not sayısı
+### Teknik Metrikler
+- API yanıt süreleri
+- Veritabanı sorgu performansı
+- Frontend yükleme süresi
 
+### Başarı Kriterleri
+- Hatasız çoklu cihaz senkronizasyonu
+- 1 saniyeden kısa API yanıt süreleri
+- 100 MB'a kadar dosya desteği
 
-Teknik Metrikler:
+## 7. Gelecek Aşama Özellikleri
 
-API yanıt süreleri
-Veritabanı sorgu performansı
-Frontend yükleme süresi
-
-
-Başarı Kriterleri:
-
-Hatasız çoklu cihaz senkronizasyonu
-1 saniyeden kısa API yanıt süreleri
-100 MB'a kadar dosya desteği
-
-
-
-7. Gelecek Aşama Özellikleri
 Şu an kapsam dışında bırakılan ancak gelecekte eklenebilecek özellikler:
 
-Kullanıcı Yönetimi ve Yetkilendirme:
+### Kullanıcı Yönetimi ve Yetkilendirme
+- Oturum açma/kayıt olma
+- Rol tabanlı erişim kontrolü
+- Not paylaşımı özellikleri
 
-Oturum açma/kayıt olma
-Rol tabanlı erişim kontrolü
-Not paylaşımı özellikleri
+### Gelişmiş Özellikler
+- Kanban görünümü
+- AI tabanlı içerik önerileri
+- Otomatik etiketleme
+- OCR ile görsel metin tanıma
 
+### Entegrasyonlar
+- Takvim entegrasyonu
+- Email entegrasyonu
+- Slack/Discord entegrasyonu
 
-Gelişmiş Özellikler:
+## 8. Alternatifler ve Değerlendirme
 
-Kanban görünümü
-AI tabanlı içerik önerileri
-Otomatik etiketleme
-OCR ile görsel metin tanıma
-
-
-Entegrasyonlar:
-
-Takvim entegrasyonu
-Email entegrasyonu
-Slack/Discord entegrasyonu
-
-
-
-8. Alternatifler ve Değerlendirme
 Bu bölümde, alternatif teknoloji teklifleri ve tasarım kararları değerlendirilmektedir:
-8.1 Frontend Alternatifi: React
-Avantajlar:
 
-Büyük ekosistem ve hazır bileşenler
-Daha yapılandırılmış kod organizasyonu
+### 8.1 Frontend Alternatifi: React
+**Avantajlar:**
+- Büyük ekosistem ve hazır bileşenler
+- Daha yapılandırılmış kod organizasyonu
 
-Dezavantajlar:
+**Dezavantajlar:**
+- Daha fazla bağımlılık ve karmaşıklık
+- Daha uzun derleme süresi
 
-Daha fazla bağımlılık ve karmaşıklık
-Daha uzun derleme süresi
+### 8.2 Backend Alternatifi: Node.js/Express
+**Avantajlar:**
+- JavaScript'in her yerde kullanılması
+- Zengin NPM ekosistemi
 
-8.2 Backend Alternatifi: Node.js/Express
-Avantajlar:
+**Dezavantajlar:**
+- Go'ya göre daha düşük performans
+- Daha yüksek kaynak kullanımı
 
-JavaScript'in her yerde kullanılması
-Zengin NPM ekosistemi
+### 8.3 Veritabanı Alternatifi: MongoDB
+**Avantajlar:**
+- Şemasız yapı ile esnek geliştirme
+- JSON benzeri doküman yapısı
 
-Dezavantajlar:
-
-Go'ya göre daha düşük performans
-Daha yüksek kaynak kullanımı
-
-8.3 Veritabanı Alternatifi: MongoDB
-Avantajlar:
-
-Şemasız yapı ile esnek geliştirme
-JSON benzeri doküman yapısı
-
-Dezavantajlar:
-
-İlişkisel sorgular için zorluklar
-Veri tutarlılığı riski
+**Dezavantajlar:**
+- İlişkisel sorgular için zorluklar
+- Veri tutarlılığı riski
 
 Mevcut seçimlerin (Vanilla JS, Go, PostgreSQL) daha hızlı geliştirme ve daha az karmaşıklık sunması nedeniyle tercih edildiği değerlendirilmiştir.
-9. Güvenlik Değerlendirmesi
+
+## 9. Güvenlik Değerlendirmesi
+
 Bu projenin güvenlik açısından dikkat edilmesi gereken noktalar:
 
-Veri Güvenliği:
+### Veri Güvenliği
+- Kişisel notların güvenli depolanması
+- Güvenli dosya yükleme ve doğrulama
 
-Kişisel notların güvenli depolanması
-Güvenli dosya yükleme ve doğrulama
+### API Güvenliği
+- Rate limiting uygulanması
+- İleriki aşamalarda JWT tabanlı kimlik doğrulama eklenecek
 
-
-API Güvenliği:
-
-Rate limiting uygulanması
-İleriki aşamalarda JWT tabanlı kimlik doğrulama eklenecek
-
-
-İstemci Güvenliği:
-
-XSS saldırılarına karşı markdown sanitizasyonu
-CSRF koruması
-
-
+### İstemci Güvenliği
+- XSS saldırılarına karşı markdown sanitizasyonu
+- CSRF koruması
 
 Güvenlik açıkları için düzenli kod incelemeleri yapılacak ve gerektiğinde dış güvenlik değerlendirmeleri alınacaktır.
-10. Sonuç
+
+## 10. Sonuç
 
 Bu RFC, basit ancak güçlü bir kişisel bilgi yönetim sistemi önerir. Temel odak noktası kullanıcı deneyimi, verimlilik ve çoklu cihaz desteğidir. Teknoloji seçimleri, hızlı geliştirme ve bakım kolaylığı dengesini gözetmektedir.
 
-Referanslar
-
-PostgreSQL Dokümantasyonu: https://www.postgresql.org/docs/
-
-Go Web Geliştirme: https://golang.org/doc/
-
-Markdown Spesifikasyonu: https://commonmark.org/
-
-API Tasarım Prensipleri: https://restfulapi.net/
-
+### Referanslar
+- [PostgreSQL Dokümantasyonu](https://www.postgresql.org/docs/)
+- [Go Web Geliştirme](https://golang.org/doc/)
+- [Markdown Spesifikasyonu](https://commonmark.org/)
+- [API Tasarım Prensipleri](https://restfulapi.net/)
