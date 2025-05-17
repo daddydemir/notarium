@@ -1,0 +1,7 @@
+database:
+  host: database-server
+  port: 5432
+  user: postgres
+  password: password
+  dbname: notarium
+  sslmode: disable
