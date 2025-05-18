@@ -33,3 +33,18 @@ func (r *Repository) GetByID(id string) (domain.Entry, error) {
 	}
 	return entry, nil
 }
+
+func (r *Repository) Update(id string, entry domain.Entry) error {
+	if err := r.db.Model(&domain.Entry{}).Where("id = ?", id).Updates(entry).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+
+func (r *Repository) Delete(id string) error {
+	if err := r.db.Where( "id = ?", id).Delete(&domain.Entry{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
