@@ -15,7 +15,7 @@ func NewRepository(db *gorm.DB) *Repository {
 
 func (r *Repository) GetAll() ([]domain.Topic, error) {
 	var topics []domain.Topic
-	if err := r.db.Find(&topics).Error; err != nil {
+	if err := r.db.Preload("Notes").Find(&topics).Error; err != nil {
 		return nil, err
 	}
 	return topics, nil
@@ -27,7 +27,7 @@ func (r *Repository) Create(topic domain.Topic) error {
 
 func (r *Repository) GetByID(id string) (domain.Topic, error) {
 	var topic domain.Topic
-	if err := r.db.First(&topic, "id = ?", id).Error; err != nil {
+	if err := r.db.Preload("Notes").First(&topic, "id = ?", id).Error; err != nil {
 		return topic, err
 	}
 	return topic, nil

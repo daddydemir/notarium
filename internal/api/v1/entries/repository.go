@@ -1,6 +1,8 @@
 package entries
 
 import (
+	"errors"
+
 	"github.com/daddydemir/notarium/internal/domain"
 	"gorm.io/gorm"
 )
@@ -28,7 +30,7 @@ func (r *Repository) Create(entry domain.Entry) error {
 
 func (r *Repository) GetByID(id string) (domain.Entry, error) {
 	var entry domain.Entry
-	if err := r.db.First(&entry, "id = ?", id).Error; err != nil {
+	if err := r.db.Preload("Topics").Preload("Topics.Notes").First(&entry, "id = ?", id).Error; err != nil {
 		return entry, err
 	}
 	return entry, nil
@@ -41,10 +43,18 @@ func (r *Repository) Update(id string, entry domain.Entry) error {
 	return nil
 }
 
-
 func (r *Repository) Delete(id string) error {
-	if err := r.db.Where( "id = ?", id).Delete(&domain.Entry{}).Error; err != nil {
+	if err := r.db.Where("id = ?", id).Delete(&domain.Entry{}).Error; err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *Repository) GetByDate(date string) (domain.Entry, error) {
+	var entry domain.Entry
+	err := r.db.Preload("Topics").Preload("Topics.Notes").First(&entry, "date = ?", date).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return entry, nil
+	}
+	return entry, err
 }

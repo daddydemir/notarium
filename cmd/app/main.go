@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 
@@ -39,6 +40,8 @@ func main() {
 
 	r := mux.NewRouter()
 
+	entries.NewHandler(entryService, r).RegisterRoutes()
+
 	r.HandleFunc("/api/v1/entries", entryHandler.List).Methods("GET")
 	r.HandleFunc("/api/v1/entry", entryHandler.Create).Methods("POST")
 	r.HandleFunc("/api/v1/entry/{id}", entryHandler.Get).Methods("GET")
@@ -69,8 +72,15 @@ func main() {
 	r.HandleFunc("/api/v1/file/{id}", fileHandler.Update).Methods("PUT")
 	r.HandleFunc("/api/v1/file/{id}", fileHandler.Delete).Methods("DELETE")
 
+	//templates.LoadTemplates("internal/web/templates")
+
+	//homeHandler := handlers.NewHomeHandler(entryService)
+	//r.Handle("/", homeHandler)
+
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	handler := cors.AllowAll().Handler(r)
+
+	log.Fatal(http.ListenAndServe(":8080", handler))
 
 }
